@@ -8,6 +8,7 @@
 import { client, xml } from "@xmpp/client";
 import type { Element } from "@xmpp/client";
 import type { XmppConfig, GatewayStartContext, XmppInboundMessage, Logger } from "./types.js";
+import type { OpenClawConfig } from "openclaw/plugin-sdk/core";
 import { resolveServer, extractUsername, bareJid } from "./config-schema.js";
 import { parsePepEvent, type PepItem } from "./pep.js";
 
@@ -153,11 +154,12 @@ export async function startXmppConnection(ctx: GatewayStartContext): Promise<voi
 
   const xmpp = client({
     service: `xmpp://${server}:${config.port ?? 5222}`,
-    domain: server,
+    domain: resolveServer({ jid: config.jid, }),
     username,
     password: config.password,
     resource: sessionResource,
-  });
+    rejectUnauthorized: false
+  } as any);
 
   // Store client for outbound messaging
   activeClients.set(accountId, xmpp);
@@ -276,7 +278,7 @@ export async function startXmppConnection(ctx: GatewayStartContext): Promise<voi
       accountId,
       running: true,
       connected: false,
-      lastDisconnect: Date.now(),
+      lastDisconnect: { at: Date.now() },
     });
     
     const reconnectState = reconnectStates.get(accountId);
@@ -496,7 +498,7 @@ function setupMessageHandler(
                   isGroup: isGroupchat,
                   roomJid,
                   senderNick,
-                  cfg,
+                  cfg: cfg as OpenClawConfig,
                   accountId,
                   config,
                   log,
@@ -560,7 +562,7 @@ function setupMessageHandler(
         isGroup: isGroupchat,
         roomJid,
         senderNick,
-        cfg,
+        cfg: cfg as OpenClawConfig,
         accountId,
         config,
         log,
@@ -655,6 +657,6 @@ function setupMessageHandler(
       senderJidForOmemo: bareJid(from),
     };
 
-    await handleInboundMessage(message, cfg, accountId, config, log, setStatus);
+    await handleInboundMessage(message, cfg as OpenClawConfig, accountId, config, log, setStatus);
   });
 }

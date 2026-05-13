@@ -2,8 +2,9 @@
  * XMPP actions handler (reactions, polls, etc.)
  */
 
-import type { OpenClawConfig } from "openclaw/plugin-sdk";
-import { jsonResult } from "openclaw/plugin-sdk";
+import type { OpenClawConfig } from "openclaw/plugin-sdk/config-types";
+import type { ChannelMessageActionDiscoveryContext } from "openclaw/plugin-sdk/channel-contract";
+import { jsonResult } from "openclaw/plugin-sdk/agent-runtime";
 import type { ChannelMessageActionName } from "./types.js";
 import { getActiveClient } from "./monitor.js";
 import { resolveXmppAccount } from "./accounts.js";
@@ -223,6 +224,10 @@ export async function handleXmppAction(params: {
  * XMPP Message Actions adapter
  */
 export const xmppMessageActions = {
+  describeMessageTool: (params: ChannelMessageActionDiscoveryContext) => {
+    return { actions: listXmppActions(params.cfg), capabilities: [] }
+  },
+ 
   listActions: ({ cfg }: { cfg: OpenClawConfig }) => listXmppActions(cfg),
 
   supportsAction: ({ action }: { action: string }) => supportsXmppAction(action),

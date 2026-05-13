@@ -54,8 +54,8 @@ export function isXmppMucJid(jid: string, mucDomains?: string[]): boolean {
 /**
  * Normalize XMPP target for messaging
  */
-export function normalizeXmppTarget(raw: string | null | undefined): string | null {
-  if (!raw) return null;
+export function normalizeXmppTarget(raw?: string | undefined): string | undefined {
+  if (!raw) return undefined;
   
   let target = raw.trim();
   
@@ -63,7 +63,7 @@ export function normalizeXmppTarget(raw: string | null | undefined): string | nu
   target = target.replace(/^(xmpp|jabber):/i, "");
   
   // Validate
-  if (!looksLikeXmppJid(target)) return null;
+  if (!looksLikeXmppJid(target)) return undefined;
   
   // Return bare JID
   return bareJid(target);
@@ -75,6 +75,7 @@ export function normalizeXmppTarget(raw: string | null | undefined): string | nu
 export function normalizeXmppMessagingTarget(params: {
   target?: string;
 }): { targetId: string } | null {
+  if (!params.target) return null;
   const normalized = normalizeXmppTarget(params.target);
   return normalized ? { targetId: normalized } : null;
 }

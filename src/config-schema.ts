@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { buildChannelConfigSchema } from "openclaw/plugin-sdk";
+import { buildChannelConfigSchema } from "openclaw/plugin-sdk/core";
 
 /**
  * XMPP action configuration schema
@@ -123,7 +123,7 @@ export type XmppConfigSchemaType = z.infer<typeof XmppConfigSchema>;
 /**
  * Build channel config schema using OpenClaw SDK helper
  */
-export function xmppChannelConfigSchema() {
+export function xmppChannelConfigSchema(): ReturnType<typeof buildChannelConfigSchema> {
   return buildChannelConfigSchema(XmppConfigSchema);
 }
 

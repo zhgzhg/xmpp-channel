@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2026-05-13
+
+- Ability to control the rejections of unathorized XMPP servers (`options.rejectUnauthorized` e.g. for the reason of invalid certificates)
+- Adjust the compatibility issues with OpenClaw v2026.5.7
+
 ## [4.1.0] - 2026-02-17
 
 ### Changed

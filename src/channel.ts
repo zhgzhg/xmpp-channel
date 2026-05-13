@@ -1,5 +1,5 @@
-import type { OpenClawConfig, GroupToolPolicyConfig } from "openclaw/plugin-sdk";
-import { DEFAULT_ACCOUNT_ID, formatPairingApproveHint, resolveToolsBySender } from "openclaw/plugin-sdk";
+import { OpenClawConfig, ChannelPlugin, DEFAULT_ACCOUNT_ID, formatPairingApproveHint } from "openclaw/plugin-sdk/core";
+import { GroupToolPolicyConfig, resolveToolsBySender } from "openclaw/plugin-sdk/channel-policy";
 import type {
   XmppConfig,
   XmppGroupConfig,
@@ -64,7 +64,7 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\
 /**
  * XMPP Channel Plugin Definition
  */
-export const xmppPlugin = {
+export const xmppPlugin: ChannelPlugin = {
   id: "xmpp",
   meta: {
     id: "xmpp",
@@ -99,7 +99,7 @@ export const xmppPlugin = {
   reload: { configPrefixes: ["channels.xmpp"] },
   
   // Onboarding wizard
-  onboarding: xmppOnboardingAdapter,
+  setupWizard: xmppOnboardingAdapter as any,
 
   // Pairing support
   pairing: {
@@ -188,6 +188,14 @@ export const xmppPlugin = {
     
     formatAllowFrom: ({ allowFrom }: { allowFrom: Array<string | number> }) =>
       formatAllowFromEntries(allowFrom),
+
+    // Provides the default outbound target for cron jobs / heartbeats.
+    // Replaces the removed heartbeat.resolveRecipients from the old SDK.
+    resolveDefaultTo: ({ cfg, accountId }: { cfg: OpenClawConfig; accountId?: string | null }): string | undefined => {
+      const account = resolveXmppAccount({ cfg, accountId });
+      const allowFrom = account.config?.allowFrom ?? [];
+      return allowFrom.find((entry) => entry !== "*" && String(entry).trim()) as string | undefined;
+    },
   },
 
   // Security adapter
@@ -295,7 +303,7 @@ export const xmppPlugin = {
 
   // Messaging adapter
   messaging: {
-    normalizeTarget: normalizeXmppMessagingTarget,
+    normalizeTarget: normalizeXmppTarget, //normalizeXmppMessagingTarget
     targetResolver: {
       looksLikeId: looksLikeXmppJid,
       hint: "<jid@server.com>",
@@ -451,7 +459,7 @@ export const xmppPlugin = {
 
   // Gateway adapter
   gateway: {
-    startAccount: async (ctx: GatewayStartContext): Promise<void> => {
+    startAccount: async (ctx: GatewayStartContext): Promise<unknown> => {
       return startXmppConnection(ctx);
     },
   },
@@ -481,7 +489,9 @@ export const xmppPlugin = {
       return { ok: true, jid: account.config.jid };
     },
     
-    buildChannelSummary: async ({ account, snapshot }: { account: ResolvedXmppAccount; snapshot?: ChannelAccountSnapshot }) => ({
+    buildChannelSummary: async (params: { account: any; cfg: OpenClawConfig; defaultAccountId: string; snapshot: ChannelAccountSnapshot }) => {
+      const { account, snapshot } = params;
+      return {
       configured: Boolean(account.config?.jid && account.config?.password),
       enabled: account.enabled,
       running: snapshot?.running ?? false,
@@ -490,9 +500,12 @@ export const xmppPlugin = {
       server: account.config?.server,
       lastConnectedAt: snapshot?.lastConnectedAt ?? null,
       lastError: snapshot?.lastError ?? null,
-    }),
+    };
+    },
     
-    buildAccountSnapshot: ({ account, runtime }: { account: ResolvedXmppAccount; runtime?: ChannelAccountSnapshot }): ChannelAccountSnapshot => ({
+    buildAccountSnapshot: (params: { account: any; cfg: OpenClawConfig; runtime?: ChannelAccountSnapshot; probe?: unknown; audit?: unknown }): ChannelAccountSnapshot => {
+      const { account, runtime } = params;
+      return {
       accountId: account.accountId,
       name: account.config?.name,
       enabled: account.enabled,
@@ -508,7 +521,8 @@ export const xmppPlugin = {
       lastError: runtime?.lastError ?? null,
       dmPolicy: account.config?.dmPolicy,
       allowFrom: account.config?.allowFrom,
-    }),
+    };
+    },
   },
 };
 

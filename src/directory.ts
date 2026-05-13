@@ -2,7 +2,8 @@
  * XMPP directory adapter - contact/room listings
  */
 
-import type { OpenClawConfig, RuntimeEnv } from "openclaw/plugin-sdk";
+import type { OpenClawConfig } from "openclaw/plugin-sdk/core";
+import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
 import type { ChannelDirectoryEntry, ChannelResolveResult, XmppConfig } from "./types.js";
 import { resolveXmppAccount } from "./accounts.js";
 import { bareJid } from "./config-schema.js";

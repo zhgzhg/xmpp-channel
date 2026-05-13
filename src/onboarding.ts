@@ -1,5 +1,7 @@
-import type { OpenClawConfig, RuntimeEnv, WizardPrompter } from "openclaw/plugin-sdk";
-import { formatDocsLink, DEFAULT_ACCOUNT_ID, normalizeAccountId, promptAccountId } from "openclaw/plugin-sdk";
+import type { WizardPrompter } from "openclaw/plugin-sdk/core";
+import type { OpenClawConfig } from "openclaw/plugin-sdk/config-types";
+import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import { formatDocsLink, DEFAULT_ACCOUNT_ID, normalizeAccountId, promptAccountId } from "openclaw/plugin-sdk/setup";
 import type { ChannelOnboardingAdapter, ChannelOnboardingStatus, ChannelOnboardingResult } from "./types.js";
 import { listXmppAccountIds, resolveDefaultXmppAccountId, resolveXmppAccount } from "./accounts.js";
 import { bareJid } from "./config-schema.js";
@@ -248,8 +250,8 @@ export const xmppOnboardingAdapter: ChannelOnboardingAdapter = {
     if (shouldPromptAccountIds || options?.promptXmppAccountId) {
       if (!overrideId) {
         accountId = await promptAccountId({
-          cfg,
-          prompter,
+          cfg: cfg as OpenClawConfig,
+          prompter: prompter as WizardPrompter,
           label: "XMPP",
           currentId: accountId,
           listAccountIds: listXmppAccountIds,

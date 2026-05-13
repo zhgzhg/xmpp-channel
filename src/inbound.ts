@@ -11,6 +11,7 @@ import { getXmppRuntime } from "./runtime.js";
 import { normalizeAllowFrom, isSenderAllowed } from "./normalize.js";
 import { sendXmppMedia } from "./outbound.js";
 import type { XmppConfig, XmppInboundMessage, Logger, ChannelAccountStatusPatch } from "./types.js";
+import type { OpenClawConfig } from "openclaw/plugin-sdk/core";
 import { activeClients, recordInboundMessageId } from "./state.js";
 import { sendChatState, sendChatMarker } from "./chat-state.js";
 import { isOmemoEnabled, encryptOmemoMessage, encryptMucOmemoMessage, isRoomOmemoCapable, buildOmemoMessageStanza } from "./omemo/index.js";
@@ -28,7 +29,7 @@ function generateMessageId(): string {
  */
 export async function handleInboundMessage(
   message: XmppInboundMessage,
-  cfg: unknown,
+  cfg: OpenClawConfig,
   accountId: string,
   config: XmppConfig,
   log?: Logger,
@@ -140,7 +141,7 @@ export async function handleInboundMessage(
     channel: "xmpp",
     accountId,
     peer: {
-      kind: message.isGroup ? "group" : "dm",
+      kind: message.isGroup ? "group" : "direct",
       id: message.isGroup ? message.roomJid! : senderBare,
     },
   });
@@ -458,7 +459,7 @@ export async function handleInboundReaction(params: {
   isGroup: boolean;
   roomJid?: string;
   senderNick?: string;
-  cfg: unknown;
+  cfg: OpenClawConfig;
   accountId: string;
   config: XmppConfig;
   log?: Logger;
@@ -554,7 +555,7 @@ export async function handleInboundReaction(params: {
     channel: "xmpp",
     accountId,
     peer: {
-      kind: isGroup ? "group" : "dm",
+      kind: isGroup ? "group" : "direct",
       id: isGroup ? roomJid! : senderBare,
     },
   });

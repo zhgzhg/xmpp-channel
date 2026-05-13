@@ -1,4 +1,5 @@
-import type { OpenClawConfig, RuntimeEnv, WizardPrompter } from "openclaw/plugin-sdk";
+import type { OpenClawConfig, WizardPrompter } from "openclaw/plugin-sdk/core";
+import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
 
 /**
  * Direct chat policy type
@@ -162,7 +163,7 @@ export interface ChannelAccountStatusPatch {
   lastStartAt?: number | null;
   lastStopAt?: number | null;
   lastConnectedAt?: number | null;
-  lastDisconnect?: number | null;
+  lastDisconnect?: string | { at: number; status?: number; error?: string; loggedOut?: boolean; } | null;
   lastError?: string | null;
   lastInboundAt?: number | null;
   [key: string]: unknown;
@@ -178,7 +179,7 @@ export interface GatewayStartContext {
   abortSignal?: AbortSignal;
   log?: Logger;
   runtime?: unknown;
-  setStatus?: (patch: ChannelAccountStatusPatch) => void;
+  setStatus?: (next: ChannelAccountSnapshot) => void;
   getStatus?: () => ChannelAccountStatusPatch;
 }
 
@@ -239,14 +240,14 @@ export interface ChannelResolveResult {
  * Channel account snapshot for status
  */
 export interface ChannelAccountSnapshot {
-  accountId?: string;
+  accountId: string;
   name?: string;
   enabled?: boolean;
   configured?: boolean;
   connected?: boolean;
   running?: boolean;
   lastConnectedAt?: number | null;
-  lastDisconnect?: number | null;
+  lastDisconnect?: string | { at: number; status?: number; error?: string; loggedOut?: boolean; } | null;
   lastMessageAt?: number | null;
   lastEventAt?: number | null;
   lastInboundAt?: number | null;

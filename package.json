@@ -22,6 +22,7 @@
     "dev": "tsc --watch",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
+    "postinstall": "patch-package",
     "test": "vitest",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
@@ -46,7 +47,8 @@
     "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",
     "@xmpp/client": "^0.13.1",
     "@xmpp/debug": "^0.13.1",
-    "mime-types": "^3.0.2"
+    "mime-types": "^3.0.2",
+    "patch-package": "^8.0.1"
   },
   "devDependencies": {
     "@types/mime-types": "^3.0.1",
@@ -60,7 +62,7 @@
     "vitest": "^1.0.0"
   },
   "peerDependencies": {
-    "openclaw": "^2026.2.2-3"
+    "openclaw": "^2026.5.7"
   },
   "overrides": {
     "zod": "4.3.6"
